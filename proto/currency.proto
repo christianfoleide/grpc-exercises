@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "proto";
+
+message RateRequest {
+    string base = 1;
+    string target = 2;
+}
+
+message RateResponse {
+    float rate = 1;
+}
+
+service ExchangeRateService {
+
+    //Unary
+    rpc GetRate(RateRequest) returns (RateResponse) {}
+    //Server-side streaming
+    rpc StreamRates(RateRequest) returns (stream RateResponse) {} 
+
+}
+
