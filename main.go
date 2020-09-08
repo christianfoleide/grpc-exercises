@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/christianfoleide/grpcurrency/proto"
 	"google.golang.org/grpc"
@@ -13,12 +14,16 @@ import (
 
 func main() {
 
+	var wg sync.WaitGroup
+	wg.Add(2) //for blocking
 	go func() {
 		http.HandleFunc("/currencies", handler)
 		log.Fatal(http.ListenAndServe("localhost:8080", nil))
 	}()
 
-	backGroundFetch() //blocks until grpc server shuts down
+	go backGroundFetch()
+
+	wg.Wait()
 }
 
 func createGRPCClient() *grpc.ClientConn {
