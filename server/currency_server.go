@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/christianfoleide/grpcurrency/proto"
+	currencypb "github.com/christianfoleide/grpcurrency/proto/currency"
 	"google.golang.org/grpc"
 )
 
@@ -29,7 +29,7 @@ func main() {
 	srv := &Server{}
 	grpcServer := grpc.NewServer()
 
-	proto.RegisterExchangeRateServiceServer(grpcServer, srv)
+	currencypb.RegisterExchangeRateServiceServer(grpcServer, srv)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
@@ -46,7 +46,7 @@ type APIResponse struct {
 }
 
 //GetRate ...
-func (s *Server) GetRate(ctx context.Context, r *proto.RateRequest) (*proto.RateResponse, error) {
+func (s *Server) GetRate(ctx context.Context, r *currencypb.RateRequest) (*currencypb.RateResponse, error) {
 
 	base := strings.ToUpper(r.Base)
 	target := strings.ToUpper(r.Target)
@@ -77,19 +77,19 @@ func (s *Server) GetRate(ctx context.Context, r *proto.RateRequest) (*proto.Rate
 	var result APIResponse
 	json.Unmarshal(b, &result)
 
-	return &proto.RateResponse{
+	return &currencypb.RateResponse{
 		Rate: float32(result.Rates[target].(float64)),
 	}, nil
 }
 
 //StreamRates received a RateRequest and returns a stream of RateResponse
-func (s *Server) StreamRates(r *proto.RateRequest, stream proto.ExchangeRateService_StreamRatesServer) error {
+func (s *Server) StreamRates(r *currencypb.RateRequest, stream currencypb.ExchangeRateService_StreamRatesServer) error {
 
 	base := strings.ToUpper(r.Base)
 	target := strings.ToUpper(r.Target)
 
 	for {
-		resp, err := s.GetRate(stream.Context(), &proto.RateRequest{
+		resp, err := s.GetRate(stream.Context(), &currencypb.RateRequest{
 			Base:   base,
 			Target: target,
 		})

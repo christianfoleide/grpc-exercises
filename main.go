@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/christianfoleide/grpcurrency/proto"
+	currencypb "github.com/christianfoleide/grpcurrency/proto/currency"
 	"google.golang.org/grpc"
 )
 
@@ -40,9 +40,9 @@ func backGroundFetch() {
 	clientConn := createGRPCClient()
 	defer clientConn.Close()
 
-	client := proto.NewExchangeRateServiceClient(clientConn)
+	client := currencypb.NewExchangeRateServiceClient(clientConn)
 
-	req := &proto.RateRequest{
+	req := &currencypb.RateRequest{
 		Base:   "USD",
 		Target: "NOK",
 	}
@@ -81,9 +81,9 @@ func handler(rw http.ResponseWriter, r *http.Request) {
 	clientConn := createGRPCClient()
 	defer clientConn.Close()
 
-	client := proto.NewExchangeRateServiceClient(clientConn)
+	client := currencypb.NewExchangeRateServiceClient(clientConn)
 
-	req := &proto.RateRequest{
+	req := &currencypb.RateRequest{
 		Base:   r.FormValue("base"),
 		Target: r.FormValue("target"),
 	}
